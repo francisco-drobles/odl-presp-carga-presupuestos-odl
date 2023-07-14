@@ -1,0 +1,114 @@
+###########################
+#                         #
+# misc spring properties  #
+#                         #
+###########################
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      enabled: detect
+  jmx:
+    enabled: true
+    unique-names: true
+  devtools:
+    livereload:
+      enabled: true
+  kafka:
+    bootstrap-servers:
+      - kafka-back-dev-kafka-bootstrap-kafka-back-dev.kafka-dev.santalucia.net:443
+    properties:
+      security.protocol: SSL
+      ssl.keystore.location: /mnt/secrets/keystore/kafka.client.keystore.jks
+      ssl.keystore.password: ${KEYSTORE_PASS}
+      ssl.truststore.location: /mnt/secrets/truststore/kafka.client.truststore.jks
+      ssl.truststore.password: ${TRUSTSTORE_PASS}
+    consumer:
+      client-id: consumerClientId-${spring.application.name}
+      max-poll-records: 500
+  cloud:
+    function:
+      definition: process
+    stream:
+      bindings:
+        process-in-0:
+          #pre#group: group.neg.sl.${santalucia.entorno}.cartera.polizas-odl.kafka.carga
+          #pre#destination: neg.sl.${santalucia.entorno}.cartera.polizas-odl.kafka.carga
+  jackson:
+    time-zone: ${santalucia.default-zone-id}
+
+###########################
+#                         #
+# i18n properties         #
+#                         #
+###########################
+  messages:
+    basename: classpath:i18n/messages
+    #cache-duration: 1s si no se especifica
+    #se cachean para siempre. Al estar en el jar no es correcto
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+###########################
+#                         #
+# security properties     #
+#                         #
+###########################
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          #posibles valores RS256,RS512 depende del realm
+          jws-algorithm: RS256
+          jwk-set-uri: https://sso-sldev.santalucia.es/auth/realms/stl-int-odl/protocol/openid-connect/certs
+          # OpenID Connect Provider URI asserts as its Issuer Identifier.
+          issuer-uri: https://sso-sldev.santalucia.es/auth/realms/stl-int-odl
+
+###########################
+#                         #
+# santalucia properties   #
+#                         #
+###########################
+santalucia:
+  #sustituir por el entorno perteneciente a cada topic
+  entorno: dev
+  default-zone-id: ${TZ:Europe/Madrid}
+  ams:
+    features:
+      feign:
+        base-packages: com.santalucia.arq.ams.odl
+      events:
+        security:
+          sso:
+            enabled: false
+            urlCert: https://sso-sldev.santalucia.es/auth/realms/3scale/protocol/openid-connect/certs
+        kafka:
+          transacted: true
+          #pre#dlq: error.neg.sl.${santalucia.entorno}.cartera.polizas-odl.kafka.carga.group.neg.sl.${santalucia.entorno}.cartera.polizas-odl.kafka.carga
+          #pre#retry: neg.sl.${santalucia.entorno}.cartera.polizas-odl.kafka.carga.retry
+
+feign:
+  client:
+    config:
+      default:
+        error-decoder: com.santalucia.cdc.core.errors.DecoderError
+###########################
+#                         #
+# logging properties      #
+#                         #
+###########################
+
+logging:
+  level:
+    root: INFO
+    com.santalucia: DEBUG
+    org.springframework: INFO
+    com.santalucia.arq.ams.componentes.database.guardium.interceptor.GuardiumMyBatisInterceptor: INFO
+    #org.springframework.web.servlet: DEBUG
+    #org.springframework.security: DEBUG
+    #org.springframework.web.client: DEBUG
+    #trazas para mostrar los errores de login debido a que salen en modo debug
+    org.springframework.security.oauth2.server.resource: DEBUG

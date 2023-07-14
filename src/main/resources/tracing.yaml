@@ -1,0 +1,12 @@
+###############
+# Tracing     #
+###############
+#Ha de estar activo para DEV y desactivado para TST y PRO
+opentracing:
+  jaeger:
+    enabled: false
+    http-sender:
+      url: https://jaeger-collector-lab-arquitectura-dev.app-dev.santalucia.net/api/traces
+  spring:
+    web:
+      enabled: false

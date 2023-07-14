@@ -1,0 +1,15 @@
+###############
+# Monitoring  #
+###############
+management:
+  server:
+    port: 8081
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /management
